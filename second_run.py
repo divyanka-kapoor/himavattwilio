@@ -3,10 +3,6 @@ import requests
 from flask import Flask, request, redirect
 from twilio.twiml.messaging_response import MessagingResponse
 from twilio.rest import Client
-from google.cloud import storage
-import logging
-import wget
-import urllib.request
 import boto3
 from io import StringIO
 import contextlib
