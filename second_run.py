@@ -6,11 +6,17 @@ from twilio.rest import Client
 from google.cloud import storage
 import logging
 import wget
+import urllib.request
+import boto3
+from io import StringIO
+import contextlib
 
-# cwd = os.getcwd()
-# DOWNLOAD_DIRECTORY = cwd
+
+cwd = os.getcwd()
+DOWNLOAD_DIRECTORY = cwd
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS']="./service_account.json"
+
 
 app = Flask(__name__)
 
@@ -29,41 +35,17 @@ def sms_reply():
 
         # Use the message SID as a filename.
         filename = request.values['MessageSid']+'.jpg'
-        bucket_name = "staging.semiotic-creek-273921.appspot.com"
-        source_file_name = request.values['MediaUrl0']
+        bucket_name = "semiotic-creek-273921.appspot.com"
+        source_file_url = request.values['MediaUrl0']
+        s3 = boto3.resource('s3')
+        bucket_name_to_upload_image_to = 'himavat'
 
-        def upload_blob(bucket_name, source_file_name, filename):
-            """Uploads a file to the bucket."""
 
-            filename = wget.download(source_file_name)
-            storage_client = storage.Client()
-            bucket = storage_client.bucket(bucket_name)
-            blob = bucket.blob(filename)
-            blob.upload_from_filename(filename, content_type='image/jpg')
-            os.remove(filename)
+        req_for_image = requests.get(source_file_url, stream=True)
+        file_object_from_req = req_for_image.raw
+        req_data = file_object_from_req.read()
 
-        upload_blob(bucket_name, source_file_name, filename)
-
-        print(
-            "File {} uploaded to {}.".format(
-                source_file_name, filename
-            )
-        )
-        # def create_file(self, filename):
-        #     self.response.write('Creating file %s\n' % filename)
-        # write_retry_params = gcs.RetryParams(backoff_factor=1.1)
-        # gcs_file = gcs.open(filename,
-        #               'wb',
-        #               retry_params=write_retry_params)
-        # image_url = request.values['MediaUrl0']
-        # gcs_file.write(requests.get(image_url).content)
-        # gcs_file.write('f'*1024*4 + '\n')
-        # gcs_file.close()
-        # self.tmp_filenames_to_clean_up.append(filename)
-        # with open('{}/{}'.format(DOWNLOAD_DIRECTORY, filename), 'wb') as f:
-        #
-        #    f.write(requests.get(image_url).content)
-        #    f.close()
+        s3.Bucket(bucket_name_to_upload_image_to).put_object(Key=filename, Body=req_data)
 
         resp.message("Thanks for your contribution to WILDNET!")
     else:
