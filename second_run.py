@@ -16,8 +16,8 @@ os.environ['GOOGLE_APPLICATION_CREDENTIALS']="./service_account.json"
 
 app = Flask(__name__)
 
-account_sid = 'ACa4a4839e8c88a2d4250621d942f5f1f7'
-auth_token = '2d18ca3fedb5260ae4869cb2ec8ecd56'
+account_sid = 'AC6d6db020e7b3e06c62ce6be656af6117'
+auth_token = '5d568104f087c1d8235de7ecbcd2ceeb'
 client = Client(account_sid, auth_token)
 
 @app.route('/sms', methods=['GET', 'POST'])
