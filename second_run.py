@@ -18,6 +18,7 @@ app = Flask(__name__)
 
 account_sid = 'AC6d6db020e7b3e06c62ce6be656af6117'
 auth_token = '5d568104f087c1d8235de7ecbcd2ceeb'
+
 client = Client(account_sid, auth_token)
 
 @app.route('/sms', methods=['GET', 'POST'])
@@ -41,7 +42,7 @@ def sms_reply():
         file_object_from_req = req_for_image.raw
         req_data = file_object_from_req.read()
 
-        s3.Bucket(bucket_name_to_upload_image_to).put_object(Key=filename, Body=req_data)
+        s3.Bucket(bucket_name_to_upload_image_to).put_object(Key=filename, Body=req_data, ACL="public-read")
 
         resp.message("Thanks for your contribution to WILDNET!")
     else:
